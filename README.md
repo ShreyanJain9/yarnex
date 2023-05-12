@@ -4,6 +4,11 @@
 
 ## Installation
 
+Will eventually publish the CLI client to Homebrew. After that, will be installable through 
+```fish
+brew install yarnex #on any linux or macOS system with homebrew on it
+```
+
 <!-- If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 by adding `yarnex` to your list of dependencies in `mix.exs`:
 
