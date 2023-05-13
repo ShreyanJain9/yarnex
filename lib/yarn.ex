@@ -1,10 +1,10 @@
 defmodule Yarn do
   require HTTPoison
-  require Poison
+  require Jason
 
   def yarn_twtxt_link(yarn_id) do
     ["", profile_name, profile_domain] =
-      Poison.decode!(Poison.encode!(String.split(yarn_id, "@")))
+      Jason.decode!(Jason.encode!(String.split(yarn_id, "@")))
 
     "https://#{profile_domain}/user/#{profile_name}/twtxt.txt"
   end
@@ -12,7 +12,7 @@ defmodule Yarn do
   def login(yarnpod, username, password) do
     endpoint = api_endpoint(yarnpod)
     token = get_jwt_token(username, password, endpoint)
-    session = Poison.decode!(Poison.encode!(%{token: token, yarnpod: yarnpod}))
+    session = Jason.decode!(Jason.encode!(%{token: token, yarnpod: yarnpod}))
     session
   end
 
@@ -26,11 +26,11 @@ defmodule Yarn do
     {:ok, response} =
       HTTPoison.post(
         "#{endpoint}/auth",
-        Poison.encode!(%{username: username, password: password}),
+        Jason.encode!(%{username: username, password: password}),
         %{"Content-Type" => "application/json"}
       )
 
-    Poison.decode!(response.body)["token"]
+    Jason.decode!(response.body)["token"]
   end
 
   @spec authenticated_headers(String.t()) :: %{optional(<<_::40, _::_*56>>) => binary}
@@ -42,33 +42,33 @@ defmodule Yarn do
     {:ok, response} =
       HTTPoison.post(
         "#{api_endpoint(session["yarnpod"])}/post",
-        Poison.encode!(%{text: twt, post_as: ""}),
+        Jason.encode!(%{text: twt, post_as: ""}),
         authenticated_headers(session["token"])
       )
 
-    Poison.decode!(response.body)
+    Jason.decode!(response.body)
   end
 
   def follow(session, url, nick) do
     {:ok, response} =
       HTTPoison.post(
         "#{api_endpoint(session["yarnpod"])}/follow",
-        Poison.encode!(%{nick: "#{nick}", url: "#{url}"}),
+        Jason.encode!(%{nick: "#{nick}", url: "#{url}"}),
         authenticated_headers(session["token"])
       )
-    Poison.decode!(response.body)
+    Jason.decode!(response.body)
   end
 
   def get_timeline(session, page) do
     {:ok, response} =
       HTTPoison.post(
         "#{api_endpoint(session["yarnpod"])}/timeline",
-        Poison.encode!(%{page: "#{page}"}),
+        Jason.encode!(%{page: "#{page}"}),
         authenticated_headers(session["token"])
       )
 
     response
-    # Poison.decode!(response.body)
+    # Jason.decode!(response.body)
   end
 
   def get_profile(yarnpod, username) do
@@ -78,7 +78,7 @@ defmodule Yarn do
         %{"Content-Type" => "application/json"}
       )
 
-    Poison.decode!(response.body)
+    Jason.decode!(response.body)
   end
 
   # def get_profile_twts(yarnpod, username, page) do
@@ -88,7 +88,7 @@ defmodule Yarn do
   #       %{"Content-Type" => "application/json"}
   #     )
 
-  #   Poison.decode!(response.body)
+  #   Jason.decode!(response.body)
   # end
 
   def reply_twt(session, hash, twt) do
