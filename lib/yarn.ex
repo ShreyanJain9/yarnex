@@ -34,6 +34,8 @@ defmodule Yarn do
     Poison.decode!(response.body)
   end
 
+
+
   def reply_twt(token, yarnpod, hash, twt) do
     post_twt(token, yarnpod, "(##{hash}) #{twt}") # damn that's some ugly code
     # well it basically just merges the hash and twt into a single string so it looks like
