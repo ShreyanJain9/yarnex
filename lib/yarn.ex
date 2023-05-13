@@ -3,17 +3,20 @@ defmodule Yarn do
   require Jason
 
   def yarn_twtxt_link(yarn_id) do
-    ["", profile_name, profile_domain] =
-      Jason.decode!(Jason.encode!(String.split(yarn_id, "@")))
+    ["", profile_name, profile_domain] = String.split(yarn_id, "@")
 
     "https://#{profile_domain}/user/#{profile_name}/twtxt.txt"
   end
 
+  # returns a session object authenticated methods can use
   def login(yarnpod, username, password) do
-    endpoint = api_endpoint(yarnpod)
-    token = get_jwt_token(username, password, endpoint)
-    session = Jason.decode!(Jason.encode!(%{token: token, yarnpod: yarnpod}))
-    session
+    Jason.decode!(
+      # yes this is extremely ugly and i should not be doing it TODO will fix later
+      Jason.encode!(%{
+        token: get_jwt_token(username, password, api_endpoint(yarnpod)),
+        yarnpod: yarnpod
+      })
+    )
   end
 
   @spec api_endpoint(String.t()) :: <<_::64, _::_*8>>
@@ -56,6 +59,7 @@ defmodule Yarn do
         Jason.encode!(%{nick: "#{nick}", url: "#{url}"}),
         authenticated_headers(session["token"])
       )
+
     Jason.decode!(response.body)
   end
 
