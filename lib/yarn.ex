@@ -34,10 +34,18 @@ defmodule Yarn do
     Poison.decode!(response.body)
   end
 
+  def get_profile(yarnpod, username) do
+    {:ok, response} =
+      HTTPoison.get(
+        "#{api_endpoint(yarnpod)}/profile/#{username}",
+        %{"Content-Type" => "application/json"}
+      )
 
-
+    Poison.decode!(response.body)
+  end
   def reply_twt(token, yarnpod, hash, twt) do
-    post_twt(token, yarnpod, "(##{hash}) #{twt}") # damn that's some ugly code
+    # damn that's some ugly code
+    post_twt(token, yarnpod, "(##{hash}) #{twt}")
     # well it basically just merges the hash and twt into a single string so it looks like
     # --> "(#abcdefg) yes you're so right!"
     # and then posts it to your yarn account where yarn can aggregate it into being a reply to
